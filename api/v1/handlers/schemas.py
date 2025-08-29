@@ -39,9 +39,9 @@ class CreateTaskOutput(BaseModel):
 
 class UpdateTaskOutput(BaseModel):
     uuid: UUID = Field(..., title="UUID задачи", description="Уникальный идентификатор обновлённой задачи")
-    name: str = Field(..., title="Название", description="Актуальное название задачи после обновления")
-    description: str = Field(..., title="Описание", description="Актуальное описание задачи после обновления")
-    status: str = Field(..., title="Статус", description="Актуальный статус задачи после обновления")
+    name: str | None = Field(None, title="Название", description="Актуальное название задачи после обновления")
+    description: str | None = Field(None, title="Описание", description="Актуальное описание задачи после обновления")
+    status: str | None = Field(None, title="Статус", description="Актуальный статус задачи после обновления")
 
 class DeleteTaskOutput(BaseModel):
     uuid: UUID = Field(..., title="UUID задачи", description="Идентификатор удалённой задачи")

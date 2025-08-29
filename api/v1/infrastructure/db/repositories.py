@@ -73,11 +73,6 @@ class TaskRepository(interfaces.TaskCreater, interfaces.TaskGetter, interfaces.T
             status=orm_task.status
         )
 
-    async def update(self, task, fields: dict):
-        for k, v in fields.items():
-            setattr(task, k, v)
-        await self.session.flush()
-        return task
 
     async def delete(self, uuid: UUID) -> None:
         orm_task = await self.session.get(models.Task, uuid)

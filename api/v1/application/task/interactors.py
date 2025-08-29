@@ -29,6 +29,7 @@ class CreateTaskInteractor:
         self.session = session
         
     async def execute(self, data: dto.CreateTaskInput) -> dto.CreateTaskOutput:
+        data.validate()
         new_task = await self.task_creater.create(data)
         await self.session.commit()
         return new_task
@@ -39,6 +40,7 @@ class UpdateTaskInteractor:
         self.session = session
         
     async def execute(self, data: dto.UpdateTaskInput) -> dto.UpdateTaskOutput:
+        data.validate()
         task = await self.task_updater.get(data.uuid)
         if not task:
             raise exceptions.TaskNotFoundError("Task не найден")

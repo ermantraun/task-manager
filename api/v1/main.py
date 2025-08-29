@@ -4,13 +4,13 @@ from fastapi.middleware.cors import CORSMiddleware
 from handlers import task
 from dishka.integrations.fastapi import setup_dishka, FastapiProvider
 from dishka import make_async_container
-from ioc import FastApiApp
+from ioc import App
 from config import Config
 from handlers import exceptions_handlers
 
 config = Config()
 
-container = make_async_container(FastApiApp(), FastapiProvider(), context={Config: config})
+container = make_async_container(App(), FastapiProvider(), context={Config: config})
 def get_fastapi_app() -> FastAPI:
 
     app = FastAPI(title=config.fastapi.title, version=config.fastapi.version, description=config.fastapi.description)

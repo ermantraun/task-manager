@@ -8,7 +8,7 @@ from application import common_interfaces
 from application.task import interfaces as task_interfaces
 from application.task import interactors
 
-class FastApiApp(Provider):
+class App(Provider):
     config = from_context(provides=Config, scope=Scope.APP)
 
     

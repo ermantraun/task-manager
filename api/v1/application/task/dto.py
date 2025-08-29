@@ -5,6 +5,29 @@ from . import exceptions
 
 ALLOWED_STATUSES = {s.value for s in entities.TaskStatus}
 
+class TaskFieldChecker:
+    @staticmethod
+    def is_valid_status(status: str) -> list[str] | None:
+        return [f"status: недопустимое значение (allowed: {','.join(ALLOWED_STATUSES)})"] if status not in ALLOWED_STATUSES else None
+    
+    @staticmethod
+    def is_valid_name(name: str) -> list[str] | None:
+        errors = []
+        if not name or not name.strip():
+            errors.append("name: пустое значение")
+        if len(name) > 100:
+            errors.append("name: длина > 100")
+        return errors if errors else None
+    
+    @staticmethod
+    def is_valid_description(description: str) -> list[str] | None:
+        errors = []
+        if not description or not description.strip():
+            errors.append("description: пустое значение")
+        if len(description) > 2000:
+            errors.append("description: длина > 2000")
+        return errors if errors else None
+
 @dataclass
 class GetTaskInput:
     uuid: UUID
@@ -14,16 +37,14 @@ class CreateTaskInput:
     name: str
     description: str
     status: str = "created"
-    def __post_init__(self):
-        errors = []
-        if not self.name or not self.name.strip():
-            errors.append("name: пустое значение")
-        if len(self.name) > 100:
-            errors.append("name: длина > 100")
-        if not self.description or not self.description.strip():
-            errors.append("description: пустое значение")
-        if self.status not in ALLOWED_STATUSES:
-            errors.append(f"status: недопустимое значение (allowed: {','.join(ALLOWED_STATUSES)})")
+    def validate(self):
+        errors: list[str] = []
+        if (e := TaskFieldChecker.is_valid_name(self.name)):
+            errors.extend(e)
+        if (e := TaskFieldChecker.is_valid_description(self.description)):
+            errors.extend(e)
+        if (e := TaskFieldChecker.is_valid_status(self.status)):
+            errors.extend(e)
         if errors:
             raise exceptions.TaskValidationError("; ".join(errors))
 
@@ -33,30 +54,25 @@ class UpdateTaskInput:
     name: str | None = None
     description: str | None = None
     status: str | None = None
-    def __post_init__(self):
+    def validate(self):
         if self.name is None and self.description is None and self.status is None:
             raise exceptions.TaskValidationError("не передано ни одного поля для обновления")
-        errors = []
+        errors: list[str] = []
         if self.name is not None:
-            if not self.name.strip():
-                errors.append("name: пустое значение")
-            if len(self.name) > 100:
-                errors.append("name: длина > 100")
-        if self.description is not None and not self.description.strip():
-            errors.append("description: пустое значение")
-        if self.status is not None and self.status not in ALLOWED_STATUSES:
-            errors.append(f"status: недопустимое значение (allowed: {','.join(ALLOWED_STATUSES)})")
+            if (e := TaskFieldChecker.is_valid_name(self.name)):
+                errors.extend(e)
+        if self.description is not None:
+            if (e := TaskFieldChecker.is_valid_description(self.description)):
+                errors.extend(e)
+        if self.status is not None:
+            if (e := TaskFieldChecker.is_valid_status(self.status)):
+                errors.extend(e)
         if errors:
             raise exceptions.TaskValidationError("; ".join(errors))
 
 @dataclass
 class DeleteTaskInput:
     uuid: str
-    def __post_init__(self):
-        try:
-            UUID(str(self.uuid))
-        except Exception:
-            raise exceptions.TaskValidationError("uuid: неверный формат")
 
 @dataclass
 class GetTaskOutput:

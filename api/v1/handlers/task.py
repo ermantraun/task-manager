@@ -64,11 +64,7 @@ async def update_task(
     data: schemas.UpdateTaskInput,
     interactor: FromDishka[interactors.UpdateTaskInteractor],
 ) -> dict:
-    if not any([data.name, data.description, data.status]):
-        raise HTTPException(
-            status_code=422,
-            detail={"error": "validation_error", "detail": "не передано ни одного поля для обновления"},
-        )
+
     result = await interactor.execute(dto.UpdateTaskInput(**data.model_dump()))
     return asdict(result)
 

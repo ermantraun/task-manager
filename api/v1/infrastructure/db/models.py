@@ -4,12 +4,9 @@ from sqlalchemy.dialects.postgresql import UUID
 from enum import Enum
 import uuid
 import datetime
+from domen.entities import TaskStatus
 
 
-class TaskStatus(Enum):
-    CREATED = "created"
-    IN_PROGRESS = "in_progress"
-    COMPLETED = "completed"
 
 class Base(DeclarativeBase):
     pass
@@ -21,7 +18,7 @@ class Task(Base):
     name: Mapped[str] = mapped_column(sa.String(100), nullable=False)
     description: Mapped[str] = mapped_column(sa.Text, nullable=True)
     status: Mapped[Enum] = mapped_column(
-        sa.Enum('created', 'in_progress', 'completed', name="task_status", native_enum=True),
+        sa.Enum(TaskStatus, name="task_status", native_enum=True),
         default=TaskStatus.CREATED,
         nullable=False
     )
@@ -29,3 +26,4 @@ class Task(Base):
 
     __table_args__ = (
         sa.UniqueConstraint('name', name='uq_name'), )
+ 
